@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import router from "./web-api/routes/router.js";
 import { DatabaseContext } from "./infrastructure/dbContext.ts/context.js";
+import cookieParser from "cookie-parser";
 
 const app: Application = express();
 const db = new DatabaseContext(PostgresqlDatabase);
@@ -14,7 +15,7 @@ dotenv.config();
 // };
 
 // app.use(cors(corsOptions));
-
+app.use(cookieParser());
 app.use(express.json());
 app.use(cors());
 app.use("/api", router);
