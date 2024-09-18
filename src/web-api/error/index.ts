@@ -1,10 +1,7 @@
-interface ApiError {
+class ApiError extends Error {
   status: number;
-  message: string;
-}
-
-class ApiError {
   constructor(status: number, message: string) {
+    super(message);
     this.status = status;
     this.message = message;
   }

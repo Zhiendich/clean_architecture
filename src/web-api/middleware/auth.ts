@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import ApiError from "../ApiError.js";
+import ApiError from "../error/index.js";
 import dotenv from "dotenv";
 import { DIContainer } from "../../infrastructure/DIContainer.js";
+
 dotenv.config();
 
 export async function authenticateToken(
@@ -20,7 +21,6 @@ export async function authenticateToken(
       return next(ApiError.unauthorize());
     }
     const jwtImplementation = DIContainer.getJwtRepository();
-
     const userData = await jwtImplementation.validateAccessToken(accessToken);
 
     if (!userData) {

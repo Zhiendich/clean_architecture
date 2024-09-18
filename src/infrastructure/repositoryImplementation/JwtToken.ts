@@ -3,11 +3,13 @@ import dotenv from "dotenv";
 import { User } from "../../domain/entities/user.js";
 import { JwtTokenRepository } from "../../domain/repositories/jwt/jwt.js";
 import JwtModal from "../postgresql/models/Jwt.js";
+import ApiError from "../../web-api/error/index.js";
+import { redis } from "../../app.js";
 
 dotenv.config();
 
 class JwtTokenImpementation implements JwtTokenRepository {
-  generateTokens(payload: object) {
+  async generateTokens(payload: User) {
     const accessToken = jwt.sign(
       payload,
       process.env.JWT_ACCESS_SECRET as string,
@@ -22,6 +24,7 @@ class JwtTokenImpementation implements JwtTokenRepository {
         expiresIn: "1d",
       }
     );
+    await redis.setCache(accessToken, payload, 60 * 60);
     return {
       accessToken,
       refreshToken,
@@ -29,9 +32,9 @@ class JwtTokenImpementation implements JwtTokenRepository {
   }
   async saveToken(userId: number, refreshToken: string) {
     const tokenData = await JwtModal.findOne({ where: { userId } });
-
     if (tokenData) {
-      return await tokenData.save();
+      await tokenData.update({ refreshToken });
+      return refreshToken;
     }
     const token = JwtModal.create({ userId, refreshToken });
     return token;
@@ -42,9 +45,26 @@ class JwtTokenImpementation implements JwtTokenRepository {
   }
   async validateAccessToken(token: string) {
     try {
-      const userData = jwt.verify(token, process.env.JWT_ACCESS_SECRET || "");
-      console.log("userData", userData);
-      return userData as User;
+      const userData = await new Promise<User | null>((resolve, reject) => {
+        jwt.verify(
+          token,
+          process.env.JWT_ACCESS_SECRET || "",
+          async (error, decoded) => {
+            if (error) {
+              return reject(ApiError.notFound());
+            }
+
+            const cachedUserData = await redis.getCache(token);
+
+            if (cachedUserData) {
+              return resolve(cachedUserData as User);
+            } else {
+              return reject(ApiError.notFound());
+            }
+          }
+        );
+      });
+      return userData;
     } catch (error) {
       return null;
     }

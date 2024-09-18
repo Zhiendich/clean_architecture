@@ -9,8 +9,8 @@ import { RefreshToken } from "../use-cases/auth/refreshToken.js";
 
 class DIContainer {
   private static _jwtRepository = new JwtTokenImpementation();
-
   private static _authRepository = new AuthImplementation(this._jwtRepository);
+  // private static _userRepository = new SequelizeGenericRepository(UserModal);
   private static _userRepository = new UserImplementation();
 
   static getAuthRepository() {
@@ -19,7 +19,6 @@ class DIContainer {
   static getUserRepository() {
     return this._userRepository;
   }
-
   static getJwtRepository() {
     return this._jwtRepository;
   }

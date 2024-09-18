@@ -1,13 +1,17 @@
+import { GenericRepository } from "./../../domain/repositories/database/database.js";
 import { JwtTokenRepository } from "./../../domain/repositories/jwt/jwt.js";
 import { AuthRepository } from "../../domain/repositories/auth/auth.js";
 import { LoginUser } from "../../domain/repositories/auth/interfaces/LoginUser.js";
 import { RegistrationUser } from "../../domain/repositories/auth/interfaces/RegistrationUser.js";
 import UserModal from "../postgresql/models/User.js";
 import bcrypt from "bcryptjs";
-import ApiError from "../../web-api/ApiError.js";
+import ApiError from "../../web-api/error/index.js";
+import { User } from "../../domain/entities/user.js";
 
 export class AuthImplementation implements AuthRepository {
-  constructor(private jwtRepository: JwtTokenRepository) {}
+  constructor(
+    private jwtRepository: JwtTokenRepository // private genericUserRepository: GenericRepository<User>
+  ) {}
   async login(dto: LoginUser) {
     const findUser = await UserModal.findOne({
       where: { email: dto.email },
@@ -22,7 +26,7 @@ export class AuthImplementation implements AuthRepository {
     if (!isPasswordEqual) {
       throw new Error("Incorrect email or password");
     }
-    const tokens = this.jwtRepository.generateTokens(findUser.dataValues);
+    const tokens = await this.jwtRepository.generateTokens(findUser.dataValues);
     await this.jwtRepository.saveToken(
       findUser.dataValues.id,
       tokens.refreshToken
@@ -65,7 +69,9 @@ export class AuthImplementation implements AuthRepository {
     }
     const user = await UserModal.findOne({ where: { id: userData.id } });
     if (user) {
-      const tokens = this.jwtRepository.generateTokens({ ...user.dataValues });
+      const tokens = await this.jwtRepository.generateTokens({
+        ...user.dataValues,
+      });
       await this.jwtRepository.saveToken(
         user.dataValues.id,
         tokens.refreshToken
