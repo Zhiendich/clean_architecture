@@ -4,12 +4,15 @@ import { User } from "../../domain/entities/user.js";
 import { JwtTokenRepository } from "../../domain/repositories/jwt/jwt.js";
 import ApiError from "../../web-api/error/index.js";
 import { Redis } from "../redis/index.js";
-import JwtModal from "../sequelize/models/token.js";
+import { SequelizeGenericRepository } from "../sequelize/generic.js";
 
 dotenv.config();
 
 class JwtTokenImpementation implements JwtTokenRepository {
-  constructor(private redis: Redis) {}
+  constructor(
+    private redis: Redis,
+    private jwtSequlize: SequelizeGenericRepository<any>
+  ) {}
   async generateTokens(payload: User) {
     const accessToken = jwt.sign(
       payload,
@@ -32,16 +35,16 @@ class JwtTokenImpementation implements JwtTokenRepository {
     };
   }
   async saveToken(userId: number, refreshToken: string) {
-    const tokenData = await JwtModal.findOne({ where: { userId } });
+    const tokenData = await this.jwtSequlize.findOne({ where: { userId } });
     if (tokenData) {
       await tokenData.update({ refreshToken });
       return refreshToken;
     }
-    const token = await JwtModal.create({ userId, refreshToken });
+    const token = await this.jwtSequlize.create({ userId, refreshToken });
     return token;
   }
   async removeToken(refreshToken: string) {
-    const tokenData = await JwtModal.destroy({ where: { refreshToken } });
+    const tokenData = await this.jwtSequlize.delete({ refreshToken });
     return tokenData;
   }
   async validateAccessToken(token: string) {
@@ -79,7 +82,9 @@ class JwtTokenImpementation implements JwtTokenRepository {
     }
   }
   async findToken(refreshToken: string) {
-    const tokenData = await JwtModal.findOne({ where: { refreshToken } });
+    const tokenData = await this.jwtSequlize.findOne({
+      where: { refreshToken },
+    });
     return tokenData;
   }
 }

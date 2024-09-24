@@ -9,11 +9,13 @@ import { RefreshToken } from "../use-cases/auth/refreshToken.js";
 import { Redis } from "./redis/index.js";
 import UserModal from "./sequelize/models/user.js";
 import { SequelizeGenericRepository } from "./sequelize/generic.js";
+import JwtModal from "./sequelize/models/token.js";
 
 class DIContainer {
   private static _redisRepository = new Redis();
   private static _jwtRepository = new JwtTokenImpementation(
-    this._redisRepository
+    this._redisRepository,
+    new SequelizeGenericRepository<any>(JwtModal)
   );
   private static _userRepository = new UserImplementation(
     new SequelizeGenericRepository<any>(UserModal)

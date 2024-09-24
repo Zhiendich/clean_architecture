@@ -43,10 +43,10 @@ export class SequelizeGenericRepository<T extends Model<T, Omit<T, "id">>>
     }
   }
 
-  async delete(id: number): Promise<number> {
+  async delete(where: Record<string, any>): Promise<number> {
     try {
       return await this.model.destroy({
-        where: { id },
+        where,
       } as DestroyOptions);
     } catch (error) {
       throw new Error("Can not delete");
