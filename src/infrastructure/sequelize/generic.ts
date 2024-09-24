@@ -1,13 +1,11 @@
 import { ModelStatic } from "sequelize";
-import { GenericRepository } from "../../../domain/repositories/database/database.js";
+import { GenericRepository } from "../../domain/repositories/database/database.js";
 import { Model, UpdateOptions, DestroyOptions } from "sequelize";
 
-export class SequelizeGenericRepository<T extends Model<T>>
+export class SequelizeGenericRepository<T extends Model<T, Omit<T, "id">>>
   implements GenericRepository<T>
 {
-  protected model: ModelStatic<T>;
-
-  constructor(model: ModelStatic<T>) {
+  constructor(protected model: ModelStatic<T>) {
     this.model = model;
   }
 
@@ -29,7 +27,7 @@ export class SequelizeGenericRepository<T extends Model<T>>
 
   async findOne(where: Record<string, any>): Promise<T | null> {
     try {
-      return await this.model.findOne({ where });
+      return await this.model.findOne(where);
     } catch (error) {
       throw new Error("Can not findOne");
     }

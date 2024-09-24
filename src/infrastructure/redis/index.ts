@@ -7,7 +7,7 @@ dotenv.config();
 export class Redis {
   private static instance: Redis;
   private client: ReturnType<typeof createClient>;
-  private constructor() {
+  constructor() {
     this.client = createClient();
     this.client.on("connect", () => {
       console.log("Connected to Redis");

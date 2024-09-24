@@ -1,13 +1,20 @@
+import { Model, DataTypes } from "sequelize";
 import { User } from "../../../domain/entities/user.js";
-import { PostgresqlDatabase } from "../sequelize/Sequelize.js";
-import { DataTypes, Model, ModelStatic } from "sequelize";
+import { PostgresqlDatabase } from "../postgresql.js";
 
 const sequelize = PostgresqlDatabase.getInstance();
 
-const UserModal: ModelStatic<Model<User, Omit<User, "id">>> = sequelize.define(
-  "user",
+class UserModal extends Model<User> {
+  public id!: number;
+  public name!: string;
+  public email!: string;
+  public password!: string;
+}
+
+UserModal.init(
   {
     id: {
+      allowNull: false,
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
@@ -25,6 +32,10 @@ const UserModal: ModelStatic<Model<User, Omit<User, "id">>> = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+  },
+  {
+    sequelize,
+    modelName: "users",
   }
 );
 

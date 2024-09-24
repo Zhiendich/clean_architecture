@@ -2,13 +2,14 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { User } from "../../domain/entities/user.js";
 import { JwtTokenRepository } from "../../domain/repositories/jwt/jwt.js";
-import JwtModal from "../postgresql/models/Jwt.js";
 import ApiError from "../../web-api/error/index.js";
-import { redis } from "../../app.js";
+import { Redis } from "../redis/index.js";
+import JwtModal from "../sequelize/models/token.js";
 
 dotenv.config();
 
 class JwtTokenImpementation implements JwtTokenRepository {
+  constructor(private redis: Redis) {}
   async generateTokens(payload: User) {
     const accessToken = jwt.sign(
       payload,
@@ -24,7 +25,7 @@ class JwtTokenImpementation implements JwtTokenRepository {
         expiresIn: "1d",
       }
     );
-    await redis.setCache(accessToken, payload, 60 * 60);
+    await this.redis.setCache(accessToken, payload, 60 * 60);
     return {
       accessToken,
       refreshToken,
@@ -36,7 +37,7 @@ class JwtTokenImpementation implements JwtTokenRepository {
       await tokenData.update({ refreshToken });
       return refreshToken;
     }
-    const token = JwtModal.create({ userId, refreshToken });
+    const token = await JwtModal.create({ userId, refreshToken });
     return token;
   }
   async removeToken(refreshToken: string) {
@@ -54,7 +55,7 @@ class JwtTokenImpementation implements JwtTokenRepository {
               return reject(ApiError.notFound());
             }
 
-            const cachedUserData = await redis.getCache(token);
+            const cachedUserData = await this.redis.getCache(token);
 
             if (cachedUserData) {
               return resolve(cachedUserData as User);

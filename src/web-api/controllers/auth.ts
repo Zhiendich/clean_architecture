@@ -4,13 +4,13 @@ import { LoginUserDto } from "../dto/auth/LoginUserDto.js";
 import { RegisterUserDto } from "../dto/auth/RegisterUserDto.js";
 import ApiError from "../error/index.js";
 import { logger } from "../../infrastructure/logger/index.js";
-import { redis } from "../../app.js";
 
 export class AuthController {
   private loginUser = DIContainer.loginUserUseCase();
   private registerUser = DIContainer.registerUserUseCase();
   private logoutUser = DIContainer.logoutUserUseCase();
   private refreshToken = DIContainer.refreshTokenUseCase();
+  private redis = DIContainer.getRedisRepository();
 
   constructor() {
     this.login = this.login.bind(this);
@@ -48,7 +48,7 @@ export class AuthController {
       const authorizationHeader = req.headers.authorization;
       if (authorizationHeader) {
         const accessToken = authorizationHeader.split(" ")[1];
-        await redis.deleteCache(accessToken);
+        await this.redis.deleteCache(accessToken);
       }
       const { refreshToken } = req.cookies;
       await this.logoutUser.execute(refreshToken);
@@ -62,11 +62,9 @@ export class AuthController {
   async refresh(req: Request, res: Response, next: NextFunction) {
     try {
       const authorizationHeader = req.headers.authorization;
-      console.log("authorizationHeader", authorizationHeader);
       if (authorizationHeader) {
         const accessToken = authorizationHeader.split(" ")[1];
-        console.log("accessToken", accessToken);
-        await redis.deleteCache(accessToken);
+        await this.redis.deleteCache(accessToken);
       }
 
       const { refreshToken } = req.cookies;

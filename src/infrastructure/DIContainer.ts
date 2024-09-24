@@ -6,21 +6,35 @@ import { RegisterUser } from "../use-cases/auth/registerUser.js";
 import { AuthImplementation } from "./repositoryImplementation/Auth.js";
 import JwtTokenImpementation from "./repositoryImplementation/JwtToken.js";
 import { RefreshToken } from "../use-cases/auth/refreshToken.js";
+import { Redis } from "./redis/index.js";
+import UserModal from "./sequelize/models/user.js";
+import { SequelizeGenericRepository } from "./sequelize/generic.js";
 
 class DIContainer {
-  private static _jwtRepository = new JwtTokenImpementation();
-  private static _authRepository = new AuthImplementation(this._jwtRepository);
-  // private static _userRepository = new SequelizeGenericRepository(UserModal);
-  private static _userRepository = new UserImplementation();
+  private static _redisRepository = new Redis();
+  private static _jwtRepository = new JwtTokenImpementation(
+    this._redisRepository
+  );
+  private static _userRepository = new UserImplementation(
+    new SequelizeGenericRepository<any>(UserModal)
+  );
+  private static _authRepository = new AuthImplementation(
+    this._jwtRepository,
+    new SequelizeGenericRepository<any>(UserModal)
+  );
 
   static getAuthRepository() {
     return this._authRepository;
   }
+
   static getUserRepository() {
     return this._userRepository;
   }
   static getJwtRepository() {
     return this._jwtRepository;
+  }
+  static getRedisRepository() {
+    return this._redisRepository;
   }
   static loginUserUseCase() {
     return new LoginUser(this.getAuthRepository());

@@ -1,19 +1,18 @@
-import { GenericRepository } from "./../../domain/repositories/database/database.js";
 import { JwtTokenRepository } from "./../../domain/repositories/jwt/jwt.js";
 import { AuthRepository } from "../../domain/repositories/auth/auth.js";
 import { LoginUser } from "../../domain/repositories/auth/interfaces/LoginUser.js";
 import { RegistrationUser } from "../../domain/repositories/auth/interfaces/RegistrationUser.js";
-import UserModal from "../postgresql/models/User.js";
 import bcrypt from "bcryptjs";
 import ApiError from "../../web-api/error/index.js";
-import { User } from "../../domain/entities/user.js";
+import { SequelizeGenericRepository } from "../sequelize/generic.js";
 
 export class AuthImplementation implements AuthRepository {
   constructor(
-    private jwtRepository: JwtTokenRepository // private genericUserRepository: GenericRepository<User>
+    private jwtRepository: JwtTokenRepository,
+    private userSequlize: SequelizeGenericRepository<any>
   ) {}
   async login(dto: LoginUser) {
-    const findUser = await UserModal.findOne({
+    const findUser = await this.userSequlize.findOne({
       where: { email: dto.email },
     });
     if (!findUser) {
@@ -36,7 +35,7 @@ export class AuthImplementation implements AuthRepository {
   }
   async registration(dto: RegistrationUser) {
     try {
-      const findUser = await UserModal.findOne({
+      const findUser = await this.userSequlize.findOne({
         where: { email: dto.email },
       });
 
@@ -44,7 +43,7 @@ export class AuthImplementation implements AuthRepository {
         throw new Error("User already exist");
       }
       const hashPassword = bcrypt.hashSync(dto.password, 6);
-      await UserModal.create({ ...dto, password: hashPassword });
+      await this.userSequlize.create({ ...dto, password: hashPassword });
     } catch (error: any) {
       throw new Error(error.message);
     }
@@ -67,7 +66,9 @@ export class AuthImplementation implements AuthRepository {
     if (!userData || !tokenFromDb) {
       throw ApiError.unauthorize();
     }
-    const user = await UserModal.findOne({ where: { id: userData.id } });
+    const user = await this.userSequlize.findOne({
+      where: { id: userData.id },
+    });
     if (user) {
       const tokens = await this.jwtRepository.generateTokens({
         ...user.dataValues,
