@@ -3,7 +3,8 @@ import { AuthController } from "../controllers/auth.js";
 import { LoginUserDto } from "../dto/auth/LoginUserDto.js";
 import validationMiddleware from "../middleware/validation.js";
 import { RegisterUserDto } from "../dto/auth/RegisterUserDto.js";
-import { authenticateToken } from "../middleware/auth.js";
+import { authenticateMiddleware } from "../middleware/auth.js";
+import { otpMiddleware } from "../middleware/OTPMiddleware.js";
 
 const router = Router();
 const authController = new AuthController();
@@ -75,6 +76,16 @@ router.post(
   validationMiddleware(RegisterUserDto),
   authController.registration
 );
-router.post("/logout", authenticateToken, authController.logout);
-router.get("/refresh", authenticateToken, authController.refresh);
+router.post(
+  "/logout",
+  authenticateMiddleware,
+  otpMiddleware,
+  authController.logout
+);
+router.get(
+  "/refresh",
+  authenticateMiddleware,
+  otpMiddleware,
+  authController.refresh
+);
 export default router;

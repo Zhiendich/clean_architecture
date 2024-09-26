@@ -51,7 +51,7 @@ export class AuthController {
         await this.redis.deleteCache(accessToken);
       }
       const { refreshToken } = req.cookies;
-      await this.logoutUser.execute(refreshToken);
+      await this.logoutUser.execute(req.body.id, refreshToken);
       res.clearCookie("refreshToken");
       res.status(200).json({ message: "Logout" });
     } catch (error: any) {

@@ -5,7 +5,7 @@ import { DIContainer } from "../../infrastructure/DIContainer.js";
 
 dotenv.config();
 
-export async function authenticateToken(
+export async function authenticateMiddleware(
   req: Request,
   res: Response,
   next: NextFunction
@@ -26,8 +26,9 @@ export async function authenticateToken(
     if (!userData) {
       return next(ApiError.unauthorize());
     }
-
+    console.log("userDAta", userData);
     req.body.id = userData.id;
+    req.body.user = userData;
     next();
   } catch (error) {
     return next(ApiError.unauthorize());

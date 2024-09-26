@@ -10,8 +10,8 @@ dotenv.config();
 
 class JwtTokenImpementation implements JwtTokenRepository {
   constructor(
-    private redis: Redis,
-    private jwtSequlize: SequelizeGenericRepository<any>
+    private jwtSequlize: SequelizeGenericRepository<any>,
+    private redis: Redis
   ) {}
   async generateTokens(payload: User) {
     const accessToken = jwt.sign(
@@ -37,7 +37,9 @@ class JwtTokenImpementation implements JwtTokenRepository {
   async saveToken(userId: number, refreshToken: string) {
     const tokenData = await this.jwtSequlize.findOne({ where: { userId } });
     if (tokenData) {
-      await tokenData.update({ refreshToken });
+      const test = await this.jwtSequlize.update(tokenData.id, {
+        refreshToken,
+      });
       return refreshToken;
     }
     const token = await this.jwtSequlize.create({ userId, refreshToken });

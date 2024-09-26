@@ -10,19 +10,31 @@ import { Redis } from "./redis/index.js";
 import UserModal from "./sequelize/models/user.js";
 import { SequelizeGenericRepository } from "./sequelize/generic.js";
 import JwtModal from "./sequelize/models/token.js";
+import OTPImplementation from "./repositoryImplementation/OTP.js";
+import { GenerateOTP } from "../use-cases/otp/generateOTP.js";
+import { VerifyOTP } from "../use-cases/otp/verifyOTP.js";
+import { GenerateQRCode } from "../use-cases/otp/generateQRCode.js";
+import { ToggleTwoFactorAuthentication } from "../use-cases/otp/toggleTwoFactor.js";
+import OTPModal from "./sequelize/models/otp.js";
 
 class DIContainer {
   private static _redisRepository = new Redis();
   private static _jwtRepository = new JwtTokenImpementation(
-    this._redisRepository,
-    new SequelizeGenericRepository<any>(JwtModal)
+    new SequelizeGenericRepository<any>(JwtModal),
+    this._redisRepository
   );
   private static _userRepository = new UserImplementation(
     new SequelizeGenericRepository<any>(UserModal)
   );
+
+  private static _OTPRepository = new OTPImplementation(
+    new SequelizeGenericRepository<any>(OTPModal),
+    this._userRepository
+  );
   private static _authRepository = new AuthImplementation(
     this._jwtRepository,
-    new SequelizeGenericRepository<any>(UserModal)
+    this._userRepository,
+    this._OTPRepository
   );
 
   static getAuthRepository() {
@@ -34,6 +46,9 @@ class DIContainer {
   }
   static getJwtRepository() {
     return this._jwtRepository;
+  }
+  static getOTPRepository() {
+    return this._OTPRepository;
   }
   static getRedisRepository() {
     return this._redisRepository;
@@ -52,6 +67,18 @@ class DIContainer {
   }
   static refreshTokenUseCase() {
     return new RefreshToken(this.getAuthRepository());
+  }
+  static generateOTPUseCase() {
+    return new GenerateOTP(this.getOTPRepository());
+  }
+  static verifyOTPUseCase() {
+    return new VerifyOTP(this.getOTPRepository());
+  }
+  static generateQRCodeUseCase() {
+    return new GenerateQRCode(this.getOTPRepository());
+  }
+  static toggleTwoFactorUseCase() {
+    return new ToggleTwoFactorAuthentication(this.getOTPRepository());
   }
 }
 

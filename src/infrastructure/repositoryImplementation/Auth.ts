@@ -4,53 +4,50 @@ import { LoginUser } from "../../domain/repositories/auth/interfaces/LoginUser.j
 import { RegistrationUser } from "../../domain/repositories/auth/interfaces/RegistrationUser.js";
 import bcrypt from "bcryptjs";
 import ApiError from "../../web-api/error/index.js";
-import { SequelizeGenericRepository } from "../sequelize/generic.js";
+import { UserRepository } from "../../domain/repositories/user/user.js";
+import { OTPRepository } from "../../domain/repositories/auth/otp.js";
 
 export class AuthImplementation implements AuthRepository {
   constructor(
     private jwtRepository: JwtTokenRepository,
-    private userSequlize: SequelizeGenericRepository<any>
+    private userRepository: UserRepository,
+    private otpRepository: OTPRepository
   ) {}
   async login(dto: LoginUser) {
-    const findUser = await this.userSequlize.findOne({
-      where: { email: dto.email },
-    });
+    const findUser = await this.userRepository.getByField("email", dto.email);
     if (!findUser) {
       throw new Error("Incorrect email or password");
     }
     const isPasswordEqual = await bcrypt.compare(
       dto.password,
-      findUser.dataValues.password
+      findUser.password
     );
     if (!isPasswordEqual) {
       throw new Error("Incorrect email or password");
     }
-    const tokens = await this.jwtRepository.generateTokens(findUser.dataValues);
-    await this.jwtRepository.saveToken(
-      findUser.dataValues.id,
-      tokens.refreshToken
-    );
-    const { password, ...userWithoutPassword } = findUser.dataValues;
+    const tokens = await this.jwtRepository.generateTokens(findUser);
+    await this.jwtRepository.saveToken(findUser.id, tokens.refreshToken);
+    const { password, ...userWithoutPassword } = findUser;
     return { tokens, user: userWithoutPassword };
   }
   async registration(dto: RegistrationUser) {
     try {
-      const findUser = await this.userSequlize.findOne({
-        where: { email: dto.email },
-      });
+      const findUser = await this.userRepository.getByField("email", dto.email);
 
       if (findUser) {
         throw new Error("User already exist");
       }
       const hashPassword = bcrypt.hashSync(dto.password, 6);
-      await this.userSequlize.create({ ...dto, password: hashPassword });
+      await this.userRepository.create({ ...dto, password: hashPassword });
     } catch (error: any) {
       throw new Error(error.message);
     }
     return "Create";
   }
-  async logout(refreshToken: string) {
+  async logout(userId: number, refreshToken: string) {
     await this.jwtRepository.removeToken(refreshToken);
+    await this.userRepository.update(userId, { isOtpVerified: false });
+    await this.otpRepository.deleteOTPToken(userId);
     return "Logout";
   }
 
@@ -66,18 +63,13 @@ export class AuthImplementation implements AuthRepository {
     if (!userData || !tokenFromDb) {
       throw ApiError.unauthorize();
     }
-    const user = await this.userSequlize.findOne({
-      where: { id: userData.id },
-    });
+    const user = await this.userRepository.get(userData.id);
     if (user) {
       const tokens = await this.jwtRepository.generateTokens({
-        ...user.dataValues,
+        ...user,
       });
-      await this.jwtRepository.saveToken(
-        user.dataValues.id,
-        tokens.refreshToken
-      );
-      const { password, ...userWithoutPassword } = user.dataValues;
+      await this.jwtRepository.saveToken(user.id, tokens.refreshToken);
+      const { password, ...userWithoutPassword } = user;
       return {
         tokens,
         user: userWithoutPassword,

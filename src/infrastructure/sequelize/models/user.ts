@@ -32,6 +32,16 @@ UserModal.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    isOtpVerified: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+    isTwoFactorEnabled: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
   },
   {
     sequelize,

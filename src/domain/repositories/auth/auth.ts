@@ -9,7 +9,7 @@ export interface AuthRepository {
     }
   >;
   registration(dto: RegistrationUser): Promise<string>;
-  logout(refreshToken: string): Promise<string>;
+  logout(userId: number, refreshToken: string): Promise<string>;
   refresh(refreshToken: string): Promise<
     { user: Omit<User, "password"> } & {
       tokens: { accessToken: string; refreshToken: string };
