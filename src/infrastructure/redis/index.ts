@@ -1,8 +1,5 @@
 import { createClient } from "redis";
 import { logger } from "../logger/index.js";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 export class Redis {
   private static instance: Redis;

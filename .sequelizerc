@@ -2,7 +2,7 @@ require("babel-register");
 const path = require("path");
 
 module.exports = {
-  config: path.resolve("./src/infrastructure/sequelize", "sequelize.config.js"),
+  config: path.resolve("./src/infrastructure/sequelize", "sequelize.process.env.js"),
   "models-path": path.resolve("./src/infrastructure/sequelize/models"),
   "migrations-path": path.resolve("./src/infrastructure/sequelize/migrations"),
   //   "seeders-path": path.resolve("./src/infrastructure/sequelize/seeders"),

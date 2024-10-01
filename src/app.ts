@@ -1,4 +1,3 @@
-import { PostgresqlDatabase } from "./infrastructure/sequelize/postgresql.js";
 import express, { Application } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -10,12 +9,14 @@ import swaggerUi from "swagger-ui-express";
 import swaggerJsDoc from "swagger-jsdoc";
 import { swaggerOptions } from "./web-api/swagger.js";
 import { DIContainer } from "./infrastructure/DIContainer.js";
+import { PostgresqlDatabase } from "./infrastructure/sequelize/postgresql.js";
+
+dotenv.config();
 
 const app: Application = express();
 const db = new DatabaseContext(PostgresqlDatabase);
-dotenv.config();
-const PORT = process.env.PORT || 5000;
 
+const PORT = process.env.PORT || 5000;
 // const corsOptions = {
 //   origin: process.env.CLIENT_URL,
 // };

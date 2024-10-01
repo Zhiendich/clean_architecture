@@ -1,4 +1,4 @@
-import { IsString, IsEmail } from "class-validator";
+import { IsString, IsEmail, IsOptional } from "class-validator";
 import { RegistrationUser } from "../../../domain/repositories/auth/interfaces/RegistrationUser.js";
 
 export class RegisterUserDto implements RegistrationUser {
@@ -8,4 +8,8 @@ export class RegisterUserDto implements RegistrationUser {
   password!: string;
   @IsString()
   name!: string;
+
+  @IsOptional()
+  @IsString()
+  activationLink!: string;
 }

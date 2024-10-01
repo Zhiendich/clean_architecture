@@ -1,7 +1,6 @@
 import "ts-node/register";
 import dotenv from "dotenv";
-
-dotenv.config();
+dotenv.config;
 
 export default {
   username: process.env.DB_USER,

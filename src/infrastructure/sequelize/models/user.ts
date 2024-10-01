@@ -42,6 +42,14 @@ UserModal.init(
       allowNull: false,
       defaultValue: false,
     },
+    isEmailVerified: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+    activationLink: {
+      type: DataTypes.STRING,
+    },
   },
   {
     sequelize,

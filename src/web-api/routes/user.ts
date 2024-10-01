@@ -1,5 +1,5 @@
 import { authenticateMiddleware } from "../middleware/auth.js";
-import { otpMiddleware } from "../middleware/OTPMiddleware.js";
+import { otpMiddleware } from "../middleware/otpMiddleware.js";
 import { UserController } from "./../controllers/user.js";
 import { Router } from "express";
 

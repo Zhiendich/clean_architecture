@@ -1,9 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import ApiError from "../error/index.js";
-import dotenv from "dotenv";
 import { DIContainer } from "../../infrastructure/DIContainer.js";
-
-dotenv.config();
 
 export async function authenticateMiddleware(
   req: Request,

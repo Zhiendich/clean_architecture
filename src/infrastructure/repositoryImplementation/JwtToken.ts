@@ -1,11 +1,10 @@
-import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import jwt from "jsonwebtoken";
 import { User } from "../../domain/entities/user.js";
 import { JwtTokenRepository } from "../../domain/repositories/jwt/jwt.js";
 import ApiError from "../../web-api/error/index.js";
 import { Redis } from "../redis/index.js";
 import { SequelizeGenericRepository } from "../sequelize/generic.js";
-
 dotenv.config();
 
 class JwtTokenImpementation implements JwtTokenRepository {

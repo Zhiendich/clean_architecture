@@ -5,6 +5,8 @@ export abstract class User {
     public password: string,
     public email: string,
     public isOtpVerified: boolean,
-    public isTwoFactorEnabled: boolean
+    public isTwoFactorEnabled: boolean,
+    public readonly activationLink: string,
+    public isEmailVerified: boolean
   ) {}
 }

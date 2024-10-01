@@ -4,7 +4,7 @@ import { LoginUserDto } from "../dto/auth/LoginUserDto.js";
 import validationMiddleware from "../middleware/validation.js";
 import { RegisterUserDto } from "../dto/auth/RegisterUserDto.js";
 import { authenticateMiddleware } from "../middleware/auth.js";
-import { otpMiddleware } from "../middleware/OTPMiddleware.js";
+import { otpMiddleware } from "../middleware/otpMiddleware.js";
 
 const router = Router();
 const authController = new AuthController();

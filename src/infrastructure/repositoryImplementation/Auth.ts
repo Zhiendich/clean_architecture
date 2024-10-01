@@ -1,3 +1,4 @@
+import { v4 } from "uuid";
 import { JwtTokenRepository } from "./../../domain/repositories/jwt/jwt.js";
 import { AuthRepository } from "../../domain/repositories/auth/auth.js";
 import { LoginUser } from "../../domain/repositories/auth/interfaces/LoginUser.js";
@@ -6,12 +7,14 @@ import bcrypt from "bcryptjs";
 import ApiError from "../../web-api/error/index.js";
 import { UserRepository } from "../../domain/repositories/user/user.js";
 import { OTPRepository } from "../../domain/repositories/auth/otp.js";
+import { EmailRepository } from "../../domain/repositories/auth/email.js";
 
 export class AuthImplementation implements AuthRepository {
   constructor(
     private jwtRepository: JwtTokenRepository,
     private userRepository: UserRepository,
-    private otpRepository: OTPRepository
+    private otpRepository: OTPRepository,
+    private emailRepository: EmailRepository
   ) {}
   async login(dto: LoginUser) {
     const findUser = await this.userRepository.getByField("email", dto.email);
@@ -38,7 +41,13 @@ export class AuthImplementation implements AuthRepository {
         throw new Error("User already exist");
       }
       const hashPassword = bcrypt.hashSync(dto.password, 6);
-      await this.userRepository.create({ ...dto, password: hashPassword });
+      const activationLink = v4();
+      await this.userRepository.create({
+        ...dto,
+        activationLink,
+        password: hashPassword,
+      });
+      await this.emailRepository.sendActivationEmail(activationLink, dto.email);
     } catch (error: any) {
       throw new Error(error.message);
     }

@@ -1,8 +1,6 @@
 import dotenv from "dotenv";
 import { Sequelize } from "sequelize";
-
 dotenv.config();
-
 export class PostgresqlDatabase {
   private static instance: Sequelize;
   private constructor() {}

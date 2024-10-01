@@ -1,3 +1,4 @@
+import { ActivateEmail } from "./../use-cases/email/activateEmail.js";
 import { GetUser } from "./../use-cases/user/getUser.js";
 import { UserImplementation } from "./repositoryImplementation/User.js";
 import { LoginUser } from "../use-cases/auth/loginUser.js";
@@ -16,6 +17,8 @@ import { VerifyOTP } from "../use-cases/otp/verifyOTP.js";
 import { GenerateQRCode } from "../use-cases/otp/generateQRCode.js";
 import { ToggleTwoFactorAuthentication } from "../use-cases/otp/toggleTwoFactor.js";
 import OTPModal from "./sequelize/models/otp.js";
+import { EmailImplementation } from "./repositoryImplementation/Email.js";
+import { SendActivationEmail } from "../use-cases/email/sendActivationEmail.js";
 
 class DIContainer {
   private static _redisRepository = new Redis();
@@ -31,10 +34,14 @@ class DIContainer {
     new SequelizeGenericRepository<any>(OTPModal),
     this._userRepository
   );
+  private static _emailRepository = new EmailImplementation(
+    this._userRepository
+  );
   private static _authRepository = new AuthImplementation(
     this._jwtRepository,
     this._userRepository,
-    this._OTPRepository
+    this._OTPRepository,
+    this._emailRepository
   );
 
   static getAuthRepository() {
@@ -53,6 +60,10 @@ class DIContainer {
   static getRedisRepository() {
     return this._redisRepository;
   }
+  static getEmailRepository() {
+    return this._emailRepository;
+  }
+
   static loginUserUseCase() {
     return new LoginUser(this.getAuthRepository());
   }
@@ -79,6 +90,12 @@ class DIContainer {
   }
   static toggleTwoFactorUseCase() {
     return new ToggleTwoFactorAuthentication(this.getOTPRepository());
+  }
+  static sendEmailUseCase() {
+    return new SendActivationEmail(this.getEmailRepository());
+  }
+  static activateEmailUseCase() {
+    return new ActivateEmail(this.getEmailRepository());
   }
 }
 
