@@ -11,7 +11,9 @@ export class SequelizeGenericRepository<T extends Model<T, Omit<T, "id">>>
 
   async create(data: Partial<T>): Promise<T> {
     try {
+      console.log("this.model", this.model);
       const newColumn = await this.model.create(data as any);
+      console.log("newColumn.dataValues", newColumn.dataValues);
       return newColumn.dataValues;
     } catch (error) {
       throw new Error("Can not create");

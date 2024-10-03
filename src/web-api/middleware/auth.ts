@@ -19,11 +19,9 @@ export async function authenticateMiddleware(
     }
     const jwtImplementation = DIContainer.getJwtRepository();
     const userData = await jwtImplementation.validateAccessToken(accessToken);
-
     if (!userData) {
       return next(ApiError.unauthorize());
     }
-    console.log("userDAta", userData);
     req.body.id = userData.id;
     req.body.user = userData;
     next();

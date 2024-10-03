@@ -1,11 +1,19 @@
+import dotenv from "dotenv";
 import { createClient } from "redis";
 import { logger } from "../logger/index.js";
 
+dotenv.config();
 export class Redis {
   private static instance: Redis;
   private client: ReturnType<typeof createClient>;
   constructor() {
-    this.client = createClient();
+    this.client = createClient({
+      password: process.env.REDIS_PASSWORD,
+      socket: {
+        host: process.env.REDIS_HOST,
+        port: Number(process.env.REDIS_PORT) || 15515,
+      },
+    });
     this.client.on("connect", () => {
       console.log("Connected to Redis");
     });

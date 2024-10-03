@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import ApiError from "../error/index.js";
+import { logger } from "../../infrastructure/logger/index.js";
 
 export default function ErrorHandler(
   err: ApiError,
@@ -10,6 +11,6 @@ export default function ErrorHandler(
   if (err instanceof ApiError) {
     return res.status(err.status).json({ message: err.message });
   }
-  console.log("ErrorHandler", err);
+  logger.error("ErrorHandler", err);
   return res.status(500).json({ message: "Server error!" });
 }
