@@ -1,21 +1,20 @@
-FROM node:20-alpine 
+# Первый этап сборки
+FROM node:20-alpine AS build
 
-# Set the working directory
-WORKDIR /.
+WORKDIR /app
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile && yarn cache clean
 
-# Copy package.json and package-lock.json
-COPY *.json  .
-
-# installing dependencies
-RUN npm install
-
-# Copy the application files
 COPY . .
+RUN yarn build
 
-#Building application
-RUN npm run build 
+# Второй этап — финальный образ
+FROM node:20-alpine
 
-# Set port for container listening
+WORKDIR /app
+COPY --from=build /app/build ./build
+COPY /ca.pem /.env  package.json yarn.lock ./
+RUN yarn install --frozen-lockfile -immutable --production && yarn cache clean
+
 EXPOSE 5000
-# Start the application
-CMD [ "npm", "start" ]
+CMD ["node", "./build/app.js"]
