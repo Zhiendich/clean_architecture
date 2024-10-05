@@ -19,6 +19,8 @@ RUN yarn build
 # Second build
 FROM node:20-alpine
 
+RUN npm install -g nodemon
+
 WORKDIR /app
 
 # Copy all files from build
@@ -30,5 +32,6 @@ RUN yarn install --frozen-lockfile -immutable --production && yarn cache clean
 
 # Set port
 EXPOSE 5000
+
 # Command when docker run
-CMD ["node", "./build/app.js"]
+CMD ["sh", "-c", "if [ \"$NODE_ENV\" = \"development\" ]; then yarn dev; else node ./build/app.js; fi"]
