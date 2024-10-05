@@ -19,7 +19,7 @@ RUN yarn build
 # Second build
 FROM node:20-alpine
 
-RUN npm install -g nodemon
+RUN npm install -g nodemon 
 
 WORKDIR /app
 
