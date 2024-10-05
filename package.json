@@ -11,7 +11,11 @@
     "docker:up": "docker-compose up -d",
     "db:create": "sequelize db:create",
     "db:migrate": "sequelize db:migrate",
-    "db:migrate:undo": "sequelize db:migrate:undo"
+    "db:migrate:undo": "sequelize db:migrate:undo",
+    "typecheck": "tsc --noEmit",
+    "prettier": "prettier --write \"**/*.{js,json,md,ts,tsx}\"",
+    "prettier:check": "prettier --list-different \"**/*.{js,json,md,ts,tsx}\"",
+    "pre_push": "typecheck"
   },
   "type": "module",
   "dependencies": {
@@ -61,8 +65,26 @@
     "@types/uuid": "^10.0.0",
     "babel-register": "^6.26.0",
     "concurrently": "^8.2.1",
+    "eslint": "^9.12.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-staged": "^1.0.1",
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.10",
     "nodemon": "^3.0.1",
+    "prettier": "^3.3.3",
     "sequelize-cli": "^6.6.2",
     "typescript": "^5.2.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn lint-staged",
+      "pre-push": "yarn pre_push"
+    }
+  },
+  "lint-staged": {
+    "**/*.+(ts|tsx)": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   }
 }
