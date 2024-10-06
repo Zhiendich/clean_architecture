@@ -23,6 +23,6 @@ jobs:
       - name: build project
         run: yarn build
       - name: prettier check
-        run: yarn prettier:check
+        run: yarn prettier
       - name: typecheck
         run: yarn typecheck
