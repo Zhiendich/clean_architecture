@@ -1,9 +1,9 @@
 name: Github Actions Push
 on:
   push:
-    branches: [master]
+    branches: [main]
   pull_request:
-    branches: [master]
+    branches: [main]
 jobs:
   init:
     runs-on: ubuntu-latest
