@@ -1,9 +1,9 @@
-import { User } from "../../domain/entities/user.js";
-import { RegistrationUser } from "../../domain/repositories/auth/interfaces/RegistrationUser.js";
-import { UserRepository } from "../../domain/repositories/user/user.js";
+import { Transaction } from 'sequelize';
+import { User } from '../../domain/entities/user.js';
+import { RegistrationUser } from '../../domain/repositories/auth/interfaces/RegistrationUser.js';
+import { UserRepository } from '../../domain/repositories/user/user.js';
 
-import { SequelizeGenericRepository } from "../sequelize/generic.js";
-
+import { SequelizeGenericRepository } from '../sequelize/generic.js';
 export class UserImplementation implements UserRepository {
   constructor(private userSequelizeGeneric: SequelizeGenericRepository<any>) {}
   async get(id: number) {
@@ -11,13 +11,13 @@ export class UserImplementation implements UserRepository {
       where: { id },
     });
     if (!findUser) {
-      throw new Error("Can not find user");
+      throw new Error('Can not find user');
     }
     const { password, ...userWithoutPassword } = findUser;
     return userWithoutPassword;
   }
-  async update(id: number, data: Partial<User>): Promise<number[]> {
-    const updatedUser = await this.userSequelizeGeneric.update(id, data);
+  async update(id: number, data: Partial<User>, transaction?: Transaction): Promise<number[]> {
+    const updatedUser = await this.userSequelizeGeneric.update(id, data, transaction);
     return updatedUser;
   }
   async getByField(field: keyof User, value: string | number): Promise<User> {
@@ -28,12 +28,12 @@ export class UserImplementation implements UserRepository {
     });
     return user;
   }
-  async create(user: RegistrationUser): Promise<User> {
-    const newUser = await this.userSequelizeGeneric.create(user);
+  async create(user: RegistrationUser, transaction?: Transaction): Promise<User> {
+    const newUser = await this.userSequelizeGeneric.create(user, transaction);
     return newUser;
   }
-  async findAndUpdate(id: number, data: Partial<User>): Promise<User> {
-    const updatedUser = await this.userSequelizeGeneric.findAndUpdate(id, data);
+  async findAndUpdate(id: number, data: Partial<User>, transaction?: Transaction): Promise<User> {
+    const updatedUser = await this.userSequelizeGeneric.findAndUpdate(id, data, transaction);
     return updatedUser;
   }
 }

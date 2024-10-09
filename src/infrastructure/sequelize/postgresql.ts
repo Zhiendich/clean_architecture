@@ -1,8 +1,8 @@
-import dotenv from "dotenv";
-import { Sequelize } from "sequelize";
+import dotenv from 'dotenv';
+import { Sequelize } from 'sequelize';
 dotenv.config();
-import fs from "fs";
-import path from "path";
+// import fs from 'fs';
+// import path from 'path';
 
 export class PostgresqlDatabase {
   private static instance: Sequelize;
@@ -14,15 +14,16 @@ export class PostgresqlDatabase {
         database: process.env.DB_NAME,
         username: process.env.DB_USER,
         password: process.env.DB_PASSWORD,
-        host: process.env.DB_HOST || "localhost",
+        host: process.env.DB_HOST || 'localhost',
         port: Number(process.env.DB_PORT) || 5432,
-        dialect: "postgres",
-        dialectOptions: {
-          ssl: {
-            rejectUnauthorized: true,
-            ca: fs.readFileSync(path.resolve(".", "ca.pem")).toString(),
-          },
-        },
+        dialect: 'postgres',
+        // dialectOptions: {
+        //   ssl: {
+        //     require: true,
+        //     rejectUnauthorized: true,
+        //     ca: fs.readFileSync(path.resolve('.', 'ca.pem')).toString(),
+        //   },
+        // },
         define: {
           timestamps: false,
         },
@@ -36,11 +37,9 @@ export class PostgresqlDatabase {
     try {
       await PostgresqlDatabase.getInstance().authenticate();
       await PostgresqlDatabase.getInstance().sync();
-      console.log(
-        "Connection to the database has been established successfully."
-      );
+      console.log('Connection to the database has been established successfully.');
     } catch (error) {
-      console.error("Unable to connect to the database:", error);
+      console.error('Unable to connect to the database:', error);
       throw error;
     }
   }

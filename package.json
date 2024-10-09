@@ -12,6 +12,7 @@
     "db:create": "sequelize db:create",
     "db:migrate": "sequelize db:migrate",
     "db:migrate:undo": "sequelize db:migrate:undo",
+    "db:seed": "sequelize db:seed:all",
     "typecheck": "tsc --noEmit",
     "prettier": "prettier --write \"**/*.{js,json,md,ts,tsx}\"",
     "prettier:check": "prettier --list-different \"**/*.{js,json,md,ts,tsx}\"",
@@ -31,8 +32,10 @@
     "crypto": "^1.0.1",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "fs": "^0.0.1-security",
     "googleapis": "^144.0.0",
     "helmet": "^8.0.0",
+    "https": "^1.0.0",
     "jsonwebtoken": "^9.0.2",
     "multer": "^1.4.5-lts.1",
     "node-fetch": "^3.3.2",
@@ -49,6 +52,7 @@
     "winston": "^3.14.2"
   },
   "devDependencies": {
+    "@eslint/js": "^9.12.0",
     "@types/bcryptjs": "^2.4.4",
     "@types/compression": "^1.7.5",
     "@types/cookie-parser": "^1.4.7",
@@ -69,12 +73,14 @@
     "eslint": "^9.12.0",
     "eslint-plugin-prettier": "^5.2.1",
     "eslint-staged": "^1.0.1",
+    "globals": "^15.11.0",
     "husky": "^9.1.6",
     "lint-staged": "^15.2.10",
     "nodemon": "^3.0.1",
     "prettier": "^3.3.3",
     "sequelize-cli": "^6.6.2",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "typescript-eslint": "^8.8.1"
   },
   "lint-staged": {
     "**/*.+(ts|tsx)": [

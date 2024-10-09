@@ -1,6 +1,6 @@
-import { Model, DataTypes } from "sequelize";
-import { User } from "../../../domain/entities/user.js";
-import { PostgresqlDatabase } from "../postgresql.js";
+import { Model, DataTypes } from 'sequelize';
+import { User } from '../../../domain/entities/user.js';
+import { PostgresqlDatabase } from '../postgresql.js';
 
 const sequelize = PostgresqlDatabase.getInstance();
 
@@ -53,8 +53,14 @@ UserModal.init(
   },
   {
     sequelize,
-    modelName: "users",
-  }
+    modelName: 'users',
+    // indexes: [
+    //   {
+    //     unique: true,
+    //     fields: ['email'],
+    //   },
+    // ],
+  },
 );
 
 export default UserModal;

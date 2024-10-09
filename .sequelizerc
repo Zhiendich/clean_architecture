@@ -1,19 +1,9 @@
-require("babel-register");
-const path = require("path");
+require('babel-register');
+const path = require('path');
 
 module.exports = {
-  config: path.resolve(
-    __dirname,
-    "./src/infrastructure/sequelize",
-    "sequelize.config.js"
-  ),
-  "models-path": path.resolve(
-    __dirname,
-    "./src/infrastructure/sequelize/models"
-  ),
-  "migrations-path": path.resolve(
-    __dirname,
-    "./src/infrastructure/sequelize/migrations"
-  ),
-  //   "seeders-path": path.resolve(__dirname, "./src/infrastructure/sequelize/seeders"),
+  config: path.resolve(__dirname, './src/infrastructure/sequelize', 'sequelize.config.js'),
+  'models-path': path.resolve(__dirname, './src/infrastructure/sequelize/models'),
+  'migrations-path': path.resolve(__dirname, './src/infrastructure/sequelize/migrations'),
+  'seeders-path': path.resolve(__dirname, './src/infrastructure/sequelize/seeders'),
 };
